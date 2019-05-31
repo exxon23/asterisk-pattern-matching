@@ -1,0 +1,15 @@
+{
+  "name": "asterisk-pattern-matching",
+  "version": "1.0.0",
+  "description": "Simple package for validation numbers by asterisk patterns",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sebastian Mach",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exxon23/asterisk-pattern-matching"
+  },
+}
