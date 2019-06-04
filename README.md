@@ -30,13 +30,15 @@ const { parseNumber } = require("asterisk-pattern-matching")
 
 // list of examples, function ends at first pattern match
 const myPatterns = [
-    // {
-    //     pattern:,   // (String) asterisk pattern
-    //     deleteFromStart:, // (String|Number) indicates, how many chars should be removed from number's START
-    //     deleteFromEnd:,   // (String|Number)indicates, how many chars should be removed from number's END  
-    //     prefix:,    // (String|Number) indicates, what should be added to number's START
-    //     suffix:     // (String|Number) indicates, what should be added to number's END  
-    // },
+    /*
+    {
+        pattern:,   // (String) asterisk pattern
+        deleteFromStart:, // (String|Number) indicates, how many chars should be removed from number's START
+        deleteFromEnd:,   // (String|Number)indicates, how many chars should be removed from number's END  
+        prefix:,    // (String|Number) indicates, what should be added to number's START
+        suffix:     // (String|Number) indicates, what should be added to number's END  
+    },
+    */
     {
         pattern: '_77X.',
         deleteFromStart: 1,

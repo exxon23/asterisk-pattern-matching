@@ -1,18 +1,19 @@
+const lettersRegex = /[xXnNzZ]/g
+const numbersRegex = /[0-9]/g
+const bracketsRegex = /\[.*?\]/g
+const charactersRegex = /[*#+]/g
+const asteriskXZNPattern = {
+  X: '[0-9]',
+  Z: '[1-9]',
+  N: '[2-9]'
+}
+
 const validateNumber = (asteriskPattern, number) => {
   if (!asteriskPattern) throw new Error('AsteriskPattern is missing')
   if (!number) throw new Error('Number for validation is missing')
   if (typeof number === 'number') number = number.toString()
   const asteriskPatternWithoutBrackets = asteriskPattern.replace(/\[.*?\]/, '@')
   let patterns = []
-  const lettersRegex = /[xXnNzZ]/g
-  const numbersRegex = /[0-9]/g
-  const bracketsRegex = /\[.*?\]/g
-  const charactersRegex = /[*#+]/g
-  const asteriskXZNPattern = {
-    X: '[0-9]',
-    Z: '[1-9]',
-    N: '[2-9]'
-  }
 
   // find reserved letters x,X,n,N,z,Z
   let lettersMatch
