@@ -1,1 +1,121 @@
-const validateNumber=(a,b)=>{if(!a)throw new Error("AsteriskPattern is missing");if(!b)throw new Error("Number for validation is missing");"number"==typeof b&&(b=b.toString());const c=a.replace(/\[.*?\]/,"@");let d=[];const e=/[xXnNzZ]/g,f=/[0-9]/g,g=/\[.*?\]/g,h=/[*#+]/g,j={X:"[0-9]",Z:"[1-9]",N:"[2-9]"};let k;do k=e.exec(c),k&&d.push({pattern:k[0],index:k.index-1,validate:(a,b,c)=>!!a.match(new RegExp(`^.{${b}}${j[c]}`))});while(k);let l;do l=f.exec(c),l&&d.push({pattern:l[0],index:l.index-1,validate:(a,b,c)=>parseInt(a[b])===parseInt(c)});while(l);let m;do m=g.exec(a),m&&d.push({pattern:m[0],index:m.index-1,validate:(a,b,c)=>!!a.match(new RegExp(`^.{${b}}${c}`))});while(m);let n;do n=h.exec(c),n&&d.push({pattern:n[0],index:n.index-1,validate:(a,b,c)=>a[b]===c});while(n);const o=c.lastIndexOf(".");0<o&&o===c.length-1&&d.push({pattern:".",index:o-1,validate:a=>a.length>=o});const p=c.lastIndexOf("!");return 0<p&&p===c.length-1&&d.push({pattern:"!",index:p-1,validate:a=>a.length>=p-1}),0>o&&0>p&&d.push({pattern:c.length-1,index:0,validate:a=>a.length===c.length-1}),d.sort((c,a)=>c.index-a.index).every(({pattern:a,index:c,validate:d})=>d(b,c,a))};exports.validateNumber=validateNumber;const modifyNumber=(a,{deleteFromStart:d=0,deleteFromEnd:e=0,prefix:b,suffix:c})=>`${b}${a.substring(parseInt(d),a.length-e)}${c}`;exports.parseNumber=(a,b)=>{try{if(!a)throw new Error("Number for validation is missing");if(!b)throw new Error("Information about asterisk pattern and number modification are missing");return Array.isArray(b)||(b=[b]),b.some(({pattern:b,...c})=>{const d=validateNumber(b,a);return d&&(a=modifyNumber(a,{...c})),d}),a}catch(a){throw a}};
+const validateNumber = (asteriskPattern, number) => {
+  if (!asteriskPattern) throw new Error('AsteriskPattern is missing')
+  if (!number) throw new Error('Number for validation is missing')
+  if (typeof number === 'number') number = number.toString()
+  const asteriskPatternWithoutBrackets = asteriskPattern.replace(/\[.*?\]/, '@')
+  let patterns = []
+  const lettersRegex = /[xXnNzZ]/g
+  const numbersRegex = /[0-9]/g
+  const bracketsRegex = /\[.*?\]/g
+  const charactersRegex = /[*#+]/g
+  const asteriskXZNPattern = {
+    X: '[0-9]',
+    Z: '[1-9]',
+    N: '[2-9]'
+  }
+
+  // find reserved letters x,X,n,N,z,Z
+  let lettersMatch
+  do {
+    lettersMatch = lettersRegex.exec(asteriskPatternWithoutBrackets)
+    if (lettersMatch) {
+      patterns.push({
+        pattern: lettersMatch[0],
+        index: lettersMatch.index - 1,
+        validate: (number, i, pattern) => !!number.match(new RegExp(`^.{${i}}${asteriskXZNPattern[pattern]}`))
+      })
+    }
+  } while (lettersMatch)
+
+  // find numbers
+  let numbersMatch
+  do {
+    numbersMatch = numbersRegex.exec(asteriskPatternWithoutBrackets)
+    if (numbersMatch) {
+      patterns.push({
+        pattern: numbersMatch[0],
+        index: numbersMatch.index - 1,
+        validate: (number, i, pattern) => parseInt(number[i]) === parseInt(pattern)
+      })
+    }
+  } while (numbersMatch)
+
+  // find patterns in [] (allowed for example [1-4],[1-25],[a-g],[.],[!])
+  let rangesMatch
+  do {
+    rangesMatch = bracketsRegex.exec(asteriskPattern)
+    if (rangesMatch) {
+      patterns.push({
+        pattern: rangesMatch[0],
+        index: rangesMatch.index - 1,
+        validate: (number, i, pattern) => !!number.match(new RegExp(`^.{${i}}${pattern}`))
+      })
+    }
+  } while (rangesMatch)
+
+  // find special characters (allowed *,#,+)
+  let charactersMatch
+  do {
+    charactersMatch = charactersRegex.exec(asteriskPatternWithoutBrackets)
+    if (charactersMatch) {
+      patterns.push({
+        pattern: charactersMatch[0],
+        index: charactersMatch.index - 1,
+        validate: (number, i, pattern) => number[i] === pattern
+      })
+    }
+  } while (charactersMatch)
+
+  // find '.' at end of pattern
+  const dotsMatch = asteriskPatternWithoutBrackets.lastIndexOf('.')
+  if (dotsMatch > 0 && (dotsMatch === asteriskPatternWithoutBrackets.length - 1)) {
+    patterns.push({
+      pattern: '.',
+      index: dotsMatch - 1,
+      validate: (number, i, pattern) => number.length >= dotsMatch
+    })
+  }
+
+  // find '!' at end of pattern
+  const exclamationMatch = asteriskPatternWithoutBrackets.lastIndexOf('!')
+  if (exclamationMatch > 0 && (exclamationMatch === asteriskPatternWithoutBrackets.length - 1)) {
+    patterns.push({
+      pattern: '!',
+      index: exclamationMatch - 1,
+      validate: (number, i, pattern) => number.length >= (exclamationMatch - 1)
+    })
+  }
+
+  // if there are no . or !, number length must be equal to pattern length
+  if (dotsMatch < 0 && exclamationMatch < 0) {
+    patterns.push({
+      pattern: asteriskPatternWithoutBrackets.length - 1,
+      index: 0,
+      validate: (number, i, pattern) => number.length === asteriskPatternWithoutBrackets.length - 1
+    })
+  }
+  // validate all number's positions, break at first unsatisfactory number
+  return patterns.sort((a, b) => a.index - b.index).every(({ pattern, index, validate }) => validate(number, index, pattern))
+}
+
+exports.validateNumber = validateNumber
+
+const modifyNumber = (number, { deleteFromStart = 0, deleteFromEnd = 0, prefix, suffix }) => {
+  return `${prefix}${number.substring(parseInt(deleteFromStart), number.length - deleteFromEnd)}${suffix}`
+}
+
+exports.parseNumber = (number, patternInfo) => {
+  try {
+    if (!number) throw new Error('Number for validation is missing')
+    if (!patternInfo) throw new Error('Information about asterisk pattern and number modification are missing')
+    if (!Array.isArray(patternInfo)) patternInfo = [patternInfo]
+    patternInfo.some(({ pattern, ...modifications }) => {
+      const matchRule = validateNumber(pattern, number)
+      if (matchRule) number = modifyNumber(number, { ...modifications })
+      return matchRule
+    })
+    return number
+  } catch (err) {
+    throw err
+  }
+}

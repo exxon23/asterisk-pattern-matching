@@ -30,10 +30,17 @@ const { parseNumber } = require("asterisk-pattern-matching")
 
 // list of examples, function ends at first pattern match
 const myPatterns = [
+    // {
+    //     pattern:,   // (String) asterisk pattern
+    //     deleteFromStart:, // (String|Number) indicates, how many chars should be removed from number's START
+    //     deleteFromEnd:,   // (String|Number)indicates, how many chars should be removed from number's END  
+    //     prefix:,    // (String|Number) indicates, what should be added to number's START
+    //     suffix:     // (String|Number) indicates, what should be added to number's END  
+    // },
     {
         pattern: '_77X.',
         deleteFromStart: 1,
-        deleteFromEnd: 1,  
+        deleteFromEnd: 1,
         prefix: '***',  
         suffix: '###'
     },
@@ -53,7 +60,14 @@ const myPatterns = [
     }
 ]
 
-parseNumber('+420999888-77', myPatterns) // 0999888123
-parseNumber('*420999888-77', myPatterns) // 12320999888-7321
+// [] = removed, () = added
+// second pattern (_[*+#0-9].) from variable myPatterns is valid,  
+// (123)[+4]20999888-7[7](321) => result 12320999888-7321
+// function stops after first valid pattern
+parseNumber('*420999888-77', myPatterns)
 
+
+// last pattern (_+X) from variable myPatterns is valid, 
+// (9)[+420]999888[-77](123) => result 0999888123
+parseNumber('+420999888-77', myPatterns)
 ```
