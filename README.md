@@ -45,7 +45,7 @@ const myPatterns = [
         suffix: '###'
     },
     {
-        pattern: '_[*+#0-9].',
+        pattern: '_[*#0-9].',
         deleteFromStart: '2',
         deleteFromEnd: '1',
         prefix: 123,
@@ -61,7 +61,7 @@ const myPatterns = [
 ]
 
 // [] = removed, () = added
-// second pattern (_[*+#0-9].) from variable myPatterns is valid,  
+// second pattern (_[*#0-9].) from variable myPatterns is valid,  
 // (123)[+4]20999888-7[7](321) => result 12320999888-7321
 // function stops after first valid pattern
 parseNumber('*420999888-77', myPatterns)
